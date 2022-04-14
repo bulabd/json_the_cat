@@ -1,22 +1,22 @@
 const request = require('request');
-const breed = process.argv.splice(2);
-const abreviation = breed.join('').toLowerCase().split('').slice(0, 4).join('');
-const URL = `https://api.thecatapi.com/v1/breeds/search?q=${abreviation}`;
-// console.log(abreviation);
 
-const breedFetcher = () => {
+const fetchBreedDescription = function(breedName, callback) {
+
+  const abreviation = breedName.toLowerCase().split('').slice(0, 4).join('');
+  const URL = `https://api.thecatapi.com/v1/breeds/search?q=${abreviation}`;
+
   request(URL, (error, statusbar, body) => {
     const data = JSON.parse(body);
-    if (data[0] === undefined) {
-      console.log(`Breed not found`);
-      process.exit();
-    }
     if (error) {
-      console.log(`Request failed`);
-      process.exit();
+      return callback(error, null);
+    } else {
+      if (data.length === 0) {
+        return callback(null, '');
+      } else {
+        return callback(null, data[0].description);
+      }
     }
-    console.log(data[0].description);
   });
 };
 
-breedFetcher();
+module.exports = { fetchBreedDescription };
